@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">pluginapk</string>
+    <string name="activity">我是插件中的Activity\'</string>
 </resources>

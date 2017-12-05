@@ -42,8 +42,8 @@ public class PluginManager {
         } else {
             this.mContext = ((Application) app).getBaseContext();
         }
-        hookInstrumentation();
         init();
+        hookInstrumentation();
     }
 
     private void init() {
@@ -69,6 +69,10 @@ public class PluginManager {
     public void loadPlugin(File apk) throws Exception {
         LoadedPlugin plugin = LoadedPlugin.create(mContext, apk);
         mPlugins.put(plugin.getPackageName(), plugin);
+    }
+
+    public PluginContainerManager getComponentsHandler() {
+        return mComponentsHandler;
     }
 
     public LoadedPlugin getLoadedPlugin(String packageName) {

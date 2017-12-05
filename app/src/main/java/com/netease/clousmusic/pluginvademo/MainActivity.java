@@ -1,5 +1,7 @@
 package com.netease.clousmusic.pluginvademo;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +29,15 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.open).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String pkg = "com.netease.clousmusic.pluginapk";
+                if (PluginManager.getInstance().getLoadedPlugin(pkg) == null) {
+                    Toast.makeText(MainActivity.this, "plugin not loaded", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent();
+                ComponentName componentName = new ComponentName(pkg, pkg + ".MainActivity");
+                intent.setComponent(componentName);
+                startActivity(intent);
             }
         });
     }
@@ -43,22 +53,5 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-
-    }
-
-    private void simulateInstallExternalPlugin(String apkName) {
-//        String demo3Apk= "demo3.apk";
-
-        // 文件是否已经存在？直接删除重来
-//        String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + apkName;
-//        File pluginFile = new File(pluginFilePath);
-//        if (pluginFile.exists()) {
-//            FileUtils.deleteQuietly(pluginFile);
-//        }
-//        copyAssetsFileToAppFiles(apkName, apkName);
-//        if (pluginFile.exists()) {
-//            PluginEngine.getInstance().install(pluginFilePath);
-//        }
     }
 }

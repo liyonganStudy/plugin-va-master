@@ -1,9 +1,12 @@
 package com.netease.clousmusic.pluginengin;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+
+import com.netease.clousmusic.pluginengin.utils.Constants;
 
 import java.util.HashMap;
 
@@ -34,6 +37,36 @@ public class PluginContainerManager {
 
     }
 
+    public void markIntentIfNeeded(Intent intent) {
+        if (intent.getComponent() == null) {
+            return;
+        }
+
+        String targetPackageName = intent.getComponent().getPackageName();
+        String targetClassName = intent.getComponent().getClassName();
+        // search map and return specific launchmode stub activity
+        if (!targetPackageName.equals(mContext.getPackageName()) && PluginManager.getInstance().getLoadedPlugin(targetPackageName) != null) {
+            intent.putExtra(Constants.KEY_IS_PLUGIN, true);
+            intent.putExtra(Constants.KEY_TARGET_PACKAGE, targetPackageName);
+            intent.putExtra(Constants.KEY_TARGET_ACTIVITY, targetClassName);
+            dispatchStubActivity(intent);
+        }
+    }
+
+    private void dispatchStubActivity(Intent intent) {
+        String targetClassName = intent.getComponent().getClassName();
+        LoadedPlugin loadedPlugin = PluginManager.getInstance().getLoadedPlugin(intent.getComponent().getPackageName());
+        ActivityInfo info = loadedPlugin.getActivityInfo(targetClassName);
+        if (info == null) {
+            throw new RuntimeException("can not find activity");
+        }
+        int launchMode = info.launchMode;
+        Resources.Theme themeObj = loadedPlugin.getResources().newTheme();
+        themeObj.applyStyle(info.theme, true);
+        String stubActivity = getStubActivity(targetClassName, launchMode, themeObj);
+        intent.setClassName(mContext, stubActivity);
+    }
+
     private String getStubActivity(String className, int launchMode, Resources.Theme theme) {
         String stubActivity= mCachedStubActivity.get(className);
         if (stubActivity != null) {
@@ -45,10 +78,10 @@ public class PluginContainerManager {
         });
         boolean windowIsTranslucent = array.getBoolean(0, false);
         array.recycle();
-        stubActivity = String.format(STUB_ACTIVITY_STANDARD, LIBRARY_PACKAGE, STUB_ACTIVITY_STANDARD);
+        stubActivity = String.format(STUB_ACTIVITY_STANDARD, LIBRARY_PACKAGE, 1);
         switch (launchMode) {
             case ActivityInfo.LAUNCH_MULTIPLE: {
-                stubActivity = String.format(STUB_ACTIVITY_STANDARD, LIBRARY_PACKAGE, STUB_ACTIVITY_STANDARD);
+                stubActivity = String.format(STUB_ACTIVITY_STANDARD, LIBRARY_PACKAGE, 1);
                 if (windowIsTranslucent) {
                     stubActivity = String.format(STUB_ACTIVITY_STANDARD, LIBRARY_PACKAGE, 2);
                 }

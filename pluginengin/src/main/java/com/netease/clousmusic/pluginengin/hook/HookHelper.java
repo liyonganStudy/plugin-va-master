@@ -2,11 +2,14 @@ package com.netease.clousmusic.pluginengin.hook;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
 
+import com.netease.clousmusic.pluginengin.utils.Constants;
 import com.netease.clousmusic.pluginengin.utils.ReflectUtil;
 
 import java.io.File;
@@ -34,6 +37,18 @@ public class HookHelper {
             }
         }
         return sInstrumentation;
+    }
+
+    public static boolean isIntentFromPlugin(Intent intent) {
+        return intent.getBooleanExtra(Constants.KEY_IS_PLUGIN, false);
+    }
+
+    public static String getTargetActivity(Intent intent) {
+        return intent.getStringExtra(Constants.KEY_TARGET_ACTIVITY);
+    }
+
+    public static String getTargetPackageName(Intent intent) {
+        return intent.getStringExtra(Constants.KEY_TARGET_PACKAGE);
     }
 
     @UiThread
